@@ -1,0 +1,19 @@
+FROM nginx:1.25
+
+LABEL GRUPO="corinthians"
+LABEL NOME1="Thiago Tanaka Padrao"
+
+USER root
+RUN useradd -u 2000 usuario
+USER usuario
+
+ENV PORT=9090
+EXPOSE 9090
+
+COPY /owlficinas-docker/html /www/owlficinas/
+COPY /owlficinas-docker/nginx.conf /www/owlficinas/
+
+VOLUME /www/arquivos
+
+CMD ["nginx", "-g", "daemon off;"]
+
