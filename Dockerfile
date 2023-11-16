@@ -1,28 +1,27 @@
 FROM nginx
 LABEL GRUPO="solen" NOME1="Adryelli Reis dos Santos"
 
-#adicionando arquivos do diretório
-COPY "./nginx.conf.template" "/etc/nginx/nginx.conf"
-COPY "html" "/www/owlficinas/"
+# Adicionando arquivos do diretório
+COPY nginx.conf.template /etc/nginx/conf.d/default.conf.template
+COPY html /www/owlficinas/
+
+ENV PORT=9090
 
 USER root
 
-#sudo update && dando permissões para o usuário nginx
-RUN apt-get update && apt-get install -y sudo
-RUN sudo chown -R nginx:nginx /var/cache/nginx && sudo chown -R nginx:nginx /var/run/ && sudo chown -R nginx:nginx /www/
+# Atualizando pacotes e dando permissões para o usuário nginx
+RUN chown -R nginx:nginx /var/cache/nginx /var/run/ /www/ /etc/nginx/conf.d/
 
 USER nginx
 
-#criando volume
-RUN mkdir /www/arquivos
-RUN chown nginx:nginx /www/arquivos
-
+# Criando volume
+RUN mkdir /www/arquivos && \
+    chown nginx:nginx /www/arquivos
 VOLUME /www/arquivos
 
-#expor porta
+# Expondo porta
 EXPOSE 9090
 
-WORKDIR /usr/share/nginx/html/
-ENTRYPOINT ["/usr/sbin/nginx"]
-
-CMD ["-g", "daemon off;"]
+# Configurando diretório de trabalho e iniciando o NGINX
+# Substituindo a variável $PORT no arquivo template.conf
+CMD /bin/sh -c "envsubst '\${PORT}' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf" && nginx -g 'daemon off;'
