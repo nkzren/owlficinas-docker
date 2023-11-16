@@ -1,9 +1,4 @@
-events {
-    worker_connections 1024;
-}
-
-http { 
-  server {
+server {
     listen ${PORT};
 
     access_log /var/log/nginx/access.log;
@@ -20,5 +15,4 @@ http {
       autoindex on;
       root /www;
     }
-  }
 }
